@@ -1,0 +1,59 @@
+﻿@model QRCodeBooking.Models.DTOs.ManualOrderDto
+@{
+   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded p-4">
+        <h3 class="mb-4">Place a Manual Order</h3>
+
+        <form asp-action="CreateManualOrder" method="post">
+            <div class="mb-3">
+                <label asp-for="DeliveryPersonName" class="form-label">Delivery Person Name</label>
+                <input asp-for="DeliveryPersonName" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="DeliveryPersonContact" class="form-label">Delivery Contact</label>
+                <input asp-for="DeliveryPersonContact" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="OTP" class="form-label">OTP</label>
+                <input asp-for="OTP" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="PaymentMethod" class="form-label">Payment Method</label>
+                <select asp-for="PaymentMethod" class="form-select">
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
+                </select>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="IsPaymentDone" class="form-check-input" />
+                <label class="form-check-label" asp-for="IsPaymentDone">Payment Done?</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Submit Order</button>
+        </form>
+
+        <hr />
+
+        <div>
+            <h5 class="mt-4">Scan QR to Autofill</h5>
+            <div id="reader" style="width:300px;"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script>
+        const qr = new Html5Qrcode("reader");
+        qr.start({ facingMode: "environment" }, {
+            fps: 10,
+            qrbox: 250
+        }, qrCodeMessage => {
+            alert(`Scanned: ${qrCodeMessage}`);
+        });
+    </script>
+}

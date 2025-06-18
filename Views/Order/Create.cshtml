@@ -1,0 +1,253 @@
+﻿ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Supplies Order</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <style>
+        .section-title {
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-top: 30px;
+        }
+
+        .card-item {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .card-item:hover {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+            }
+
+        .quantity-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .quantity-box button {
+                width: 30px;
+                height: 30px;
+            }
+
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
+<body class="container py-4">
+    <h2 class="text-center mb-4">Create Order</h2>
+
+    <!-- Step 1: Select Item -->
+    <div>
+        <p class="section-title">1. Select Item</p>
+        <p>Browse and select items to order</p>
+
+        <div class="mb-3">
+            <label for="categorySelect" class="form-label">Category</label>
+            <select class="form-select" id="categorySelect">
+                <option selected>Select a category</option>
+                <option value="Beverage">Beverage</option>
+                <option value="Cleaning">Cleaning</option>
+                <option value="Food">Food</option>
+                <option value="Stationery">Stationery</option>
+                <option value="Electronics">Electronics</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="loadItems()">Continue</button>
+    </div>
+
+    <!-- Step 2: Display Items -->
+    <div id="itemsSection" style="display: none">
+        <p class="section-title">2. Available Items</p>
+        <div class="row" id="itemCards"></div>
+    </div>
+
+    <!-- Step 3: Place Order -->
+    <div id="orderSection" style="display: none">
+        <p class="section-title">3. Place Order</p>
+        <div class="card p-3">
+            <h5 id="orderItemTitle"></h5>
+            <p id="orderItemDesc"></p>
+            <p><small class="text-muted">Typically delivered within 15-20 minutes</small></p>
+
+            <div class="mb-3">
+                <label>Quantity</label>
+                <div class="quantity-box">
+                    <button class="btn btn-outline-secondary" onclick="adjustQty(-1)">-</button>
+                    <span id="quantityVal">1</span>
+                    <button class="btn btn-outline-secondary" onclick="adjustQty(1)">+</button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="notes">Additional Notes (Optional)</label>
+                <textarea class="form-control" id="notes" rows="3" placeholder="Any special instructions or details..."></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="requestedBy">Requested by</label>
+                <input class="form-control" type="text" id="requestedBy" placeholder="e.g., John Doe">
+            </div>
+            <div class="mb-3">
+                <label for="requestedDesk">Desk NO</label>
+                <input class="form-control" type="text" id="requestedDesk" placeholder="e.g., Desk #23">
+            </div>
+
+            <button class="btn btn-success" onclick="submitOrder()">Submit Order</button>
+        </div>
+
+        
+    </div>
+    <div id="manualEntrySection" class="card p-3 mt-3" style="display: none;">
+        <p class="section-title">Enter Item Details Manually</p>
+        <div class="mb-3">
+            <label for="manualItemName" class="form-label">Item Name</label>
+            <input type="text" class="form-control" id="manualItemName" placeholder="e.g., Custom Item">
+        </div>
+        <div class="mb-3">
+            <label for="manualItemDesc" class="form-label">Item Description</label>
+            <textarea class="form-control" id="manualItemDesc" rows="2" placeholder="Describe the item..."></textarea>
+        </div>
+        <button class="btn btn-info" onclick="useManualItem()">Use This Item</button>
+    </div>
+
+    <script>
+        const dummyData = {
+            Beverage: [
+                { name: "Coffee", desc: "Premium Arabica coffee" },
+                { name: "Tea", desc: "Assorted tea bags" },
+                { name: "Manual", desc: "Enter item details manually" },
+            ],
+            Cleaning: [
+                { name: "Hand Sanitizer", desc: "Alcohol-based hand sanitizer" },
+                { name: "Disinfectant Spray", desc: "Kills 99.9% germs" },
+                { name: "Manual", desc: "Enter item details manually" },
+            ],
+            Food: [
+                { name: "Biscuits", desc: "Assorted cookies and biscuits" },
+                { name: "Fruit Pack", desc: "Fresh cut seasonal fruits" },
+                { name: "Manual", desc: "Enter item details manually" },
+            ],
+            Stationery: [
+                { name: "Notebook", desc: "200-page ruled notebook" },
+                { name: "Pens", desc: "Blue/Black ink pens pack" },
+                { name: "Manual", desc: "Enter item details manually" },
+            ],
+            Electronics: [
+                { name: "Mouse", desc: "USB Optical Mouse" },
+                { name: "Keyboard", desc: "Wired USB Keyboard" },
+                { name: "Manual", desc: "Enter item details manually" },
+            ]
+        };
+
+        function loadItems() {
+            const category = document.getElementById("categorySelect").value;
+            const section = document.getElementById("itemsSection");
+            const cards = document.getElementById("itemCards");
+
+            if (!dummyData[category]) {
+                section.style.display = "none";
+                return;
+            }
+
+            cards.innerHTML = "";
+            dummyData[category].forEach(item => {
+                cards.innerHTML += `
+                            <div class="col-md-4 mb-3">
+                                <div class="card card-item p-3" onclick='selectItem("${item.name}", "${item.desc}")'>
+                                    <h6>${item.name}</h6>
+                                    <p>${item.desc}</p>
+                                </div>
+                            </div>
+                        `;
+            });
+
+            section.style.display = "block";
+        }
+
+        function selectItem(name, desc) {
+            if (name === "Manual") {
+                document.getElementById("manualEntrySection").style.display = "block";
+                document.getElementById("orderSection").style.display = "none";
+                return;
+            }
+
+            document.getElementById("orderItemTitle").innerText = name;
+            document.getElementById("orderItemDesc").innerText = desc;
+            document.getElementById("manualEntrySection").style.display = "none";
+            document.getElementById("orderSection").style.display = "block";
+            document.getElementById("quantityVal").innerText = "1";
+        }
+
+        function useManualItem() {
+            const name = document.getElementById("manualItemName").value.trim();
+            const desc = document.getElementById("manualItemDesc").value.trim();
+
+            if (!name || !desc) {
+                alert("Please fill in both fields.");
+                return;
+            }
+
+            document.getElementById("orderItemTitle").innerText = name;
+            document.getElementById("orderItemDesc").innerText = desc;
+            document.getElementById("manualEntrySection").style.display = "none";
+            document.getElementById("orderSection").style.display = "block";
+            document.getElementById("quantityVal").innerText = "1";
+        }
+
+        function adjustQty(change) {
+            const qtyEl = document.getElementById("quantityVal");
+            let qty = parseInt(qtyEl.innerText);
+            qty = Math.max(1, qty + change);
+            qtyEl.innerText = qty;
+        }
+
+        function submitOrder() {
+            const category = document.getElementById("categorySelect").value;
+            const itemName = document.getElementById("orderItemTitle").innerText;
+            const description = document.getElementById("orderItemDesc").innerText;
+            const quantity = parseInt(document.getElementById("quantityVal").innerText);
+            const notes = document.getElementById("notes").value;
+            const requestedBy = document.getElementById("requestedBy").value.trim();
+            const requestedDesk = document.getElementById("requestedDesk").value.trim();
+
+            if (!requestedBy || !requestedDesk) {
+                alert("Please enter your name and desk number.");
+                return;
+            }
+
+            const data = {
+                category,
+                itemName,
+                description,
+                quantity,
+                notes,
+                requestedBy,
+                requestedDesk
+            };
+
+            $.ajax({
+                url: '@Url.Action("SubmitOrder", "Order")',
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: function (response) {
+                    alert("Order Submitted Successfully!");
+                    console.log(response);
+                },
+                error: function (err) {
+                    console.error("Error submitting order:", err);
+                    alert("Failed to submit order.");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

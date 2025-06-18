@@ -1,0 +1,12 @@
+﻿@model QRCodeBooking.Models.Entitys.OfficeSupplyOrder
+
+<div>
+    <h5>@Model.ItemName</h5>
+    <p><strong>Category:</strong> @Model.Category</p>
+    <p><strong>Description:</strong> @Model.Description</p>
+    <p><strong>Requested By:</strong> @Model.RequestedBy</p>
+    <p><strong>Desk No:</strong> @Model.requestedDesk</p>
+    <p><strong>Quantity:</strong> @Model.Quantity</p>
+    <p><strong>Notes:</strong> @Model.Notes</p>
+    <p><strong>Placed On:</strong> @Model.CreatedOn.ToString("g")</p>
+</div>

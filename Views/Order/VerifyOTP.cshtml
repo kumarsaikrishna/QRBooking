@@ -1,0 +1,21 @@
+﻿@model QRCodeBooking.Models.DTOs.VerifyOTPDto
+@{
+    ViewBag.Title = "Verify OTP";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow p-4 rounded">
+        <h3>Verify OTP</h3>
+
+        <form asp-action="VerifyOTP" method="post">
+            <input type="hidden" asp-for="OrderId" />
+            <div class="mb-3">
+                <label asp-for="OTP" class="form-label">Enter OTP</label>
+                <input asp-for="OTP" class="form-control" />
+                <span asp-validation-for="OTP" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Verify</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@model IEnumerable<QRCodeBooking.Models.Entitys.OfficeSupplyOrder>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Boy Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container py-4">
+    <h2 class="text-center mb-4">Orders Pending Fulfillment</h2>
+
+    <div class="row">
+        @foreach (var order in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card p-3">
+                    <h5>@order.ItemName</h5>
+                    <p><strong>Requested By:</strong> @order.RequestedBy</p>
+                    <p><strong>Desk No:</strong> @order.requestedDesk</p>
+                    <p><strong>Quantity:</strong> @order.Quantity</p>
+                    <p><strong>Notes:</strong> @order.Notes</p>
+                    <p><small class="text-muted">Order placed on @order.CreatedOn.ToString("g")</small></p>
+                    <button class="btn btn-success" onclick="viewOrderDetails(@order.Id)">View Details</button>
+                    <a href="@Url.Action("MarkOrderAsFulfilled", "Order", new { id = order.Id })" class="btn btn-primary mt-2">Mark as Fulfilled</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="orderDetailsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function viewOrderDetails(orderId) {
+            // You can use AJAX to load the order details dynamically
+            $.ajax({
+                url: '@Url.Action("GetOrderDetails", "Order")',  // Controller action to fetch details
+                type: 'GET',
+                data: { id: orderId },
+                success: function (data) {
+                    document.getElementById("orderDetailsContent").innerHTML = data;
+                    var myModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                    myModal.show();
+                },
+                error: function () {
+                    alert('Error loading order details');
+                }
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
